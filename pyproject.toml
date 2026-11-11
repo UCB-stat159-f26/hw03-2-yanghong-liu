@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Career match data and age-gap plots from Tennis Abstract"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["pandas", "requests"]
+dependencies = ["matplotlib", "pandas", "requests"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
