@@ -13,7 +13,7 @@ python -c "import tennis_career"
 
 ## Tests
 
-Run `python -m unittest discover -s tests` from the repository root. The Serena fixture is a small example based on the match data in the [HW 03 instructions](https://stat159.berkeley.edu/fall-2026/hws/hw03/hw03.html#tests).
+Run `python -m unittest discover -s tests` from the repository root. The Serena and Nadal fixtures use the two sample data formats in the [HW 03 instructions](https://stat159.berkeley.edu/fall-2026/hws/hw03/hw03.html#tests).
 
 ## AI assistance
 

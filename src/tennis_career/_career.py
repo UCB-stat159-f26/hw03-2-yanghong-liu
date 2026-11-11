@@ -12,7 +12,7 @@ _MATCH_FIELDS = {
     "match_date": 0,
     "result": 4,
     "opponent": 11,
-    "opponent_birth_date": 16,
+    "opponent_age_value": 16,
 }
 
 
@@ -37,13 +37,23 @@ def _age_in_years(match_dates: pd.Series, birth_dates: pd.Series | pd.Timestamp)
     return (match_dates - birth_dates).dt.days / 365.25
 
 
+def _opponent_ages(values: pd.Series, match_dates: pd.Series) -> pd.Series:
+    """Interpret the field as a birth date or an age already in years."""
+    values = values.astype("string").str.strip()
+    is_birth_date = values.str.fullmatch(r"[0-9]{8}", na=False)
+    birth_dates = pd.to_datetime(values.where(is_birth_date), format="%Y%m%d", errors="coerce")
+    listed_ages = pd.to_numeric(values.mask(is_birth_date), errors="coerce").astype(float)
+    ages = listed_ages.mask(is_birth_date, _age_in_years(match_dates, birth_dates))
+    return ages.where(ages > 0)
+
+
 def _parse_career_matches(source: str, player_birth_date: date) -> pd.DataFrame:
-    """Convert match rows with opponent birth dates to ages and results."""
+    """Convert career match rows to ages and results."""
     matches = pd.DataFrame.from_records(map(_match_fields, _read_match_rows(source)))
     match_dates = pd.to_datetime(matches["match_date"], format="%Y%m%d")
-    opponent_birth_dates = pd.to_datetime(matches.pop("opponent_birth_date"), format="%Y%m%d")
+    opponent_age_values = matches.pop("opponent_age_value")
     matches["match_date"] = match_dates
     matches["player_age"] = _age_in_years(match_dates, pd.Timestamp(player_birth_date))
-    matches["opponent_age"] = _age_in_years(match_dates, opponent_birth_dates)
+    matches["opponent_age"] = _opponent_ages(opponent_age_values, match_dates)
     matches["age_difference"] = matches["player_age"] - matches["opponent_age"]
     return matches
