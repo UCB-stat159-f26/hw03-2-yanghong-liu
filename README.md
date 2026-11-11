@@ -29,6 +29,11 @@ plot_age_gap(nadal).figure.savefig("nadal-age-gap.png", dpi=150)
 `"SerenaWilliams"`. An unknown player such as `"GastonSanchez"` raises a
 `ValueError` that names the input.
 
+The package downloads the latest match records on each call and reuses a
+player's profile within the running Python process. For a short rate limit,
+it waits and retries the request once. A continuing rate limit raises a
+`ConnectionError`.
+
 The returned DataFrame has `match_date`, `result`, `opponent`, `player_age`,
 `opponent_age`, and `age_difference` columns. Dates are tournament dates
 from the source. For fields supplied as birth dates, ages are elapsed days

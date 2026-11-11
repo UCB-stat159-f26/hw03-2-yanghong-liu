@@ -1,8 +1,10 @@
 """Retrieve a player's profile and career match data from Tennis Abstract."""
 
 from datetime import date, datetime
+from functools import lru_cache
 from html import unescape
 import re
+from time import sleep
 import unicodedata
 from urllib.parse import parse_qs, urlsplit
 
@@ -17,9 +19,19 @@ _BIRTH_DATE = re.compile(r"\bvar\s+dob\s*=\s*['\"]?([0-9]{8})\b")
 _PROFILE_NAME = re.compile(r"<title[^>]*>\s*Tennis Abstract:\s*(.+?)\s+Match Results", re.I | re.S)
 
 
+def _request_with_retry(url: str, params: dict[str, str]) -> requests.Response:
+    response = requests.get(url, params=params or None, timeout=15)
+    if response.status_code == 429:
+        delay = response.headers.get("Retry-After", "5")
+        if re.fullmatch(r"[0-9]{1,2}", delay) and int(delay) <= 10:
+            sleep(max(1, int(delay)))
+            response = requests.get(url, params=params or None, timeout=15)
+    return response
+
+
 def _get(path: str, **params: str) -> requests.Response | None:
     try:
-        response = requests.get(_SITE + path, params=params or None, timeout=15)
+        response = _request_with_retry(_SITE + path, params)
         if response.status_code == 404:
             return None
         response.raise_for_status()
@@ -52,6 +64,7 @@ def _lookup_player_id(name: str, guessed_id: str) -> str | None:
     return None
 
 
+@lru_cache(maxsize=128)
 def _player_profile(player_id: str) -> tuple[date, str | None]:
     response = _get("/cgi-bin/player.cgi", p=player_id)
     birth_date = _BIRTH_DATE.search(response.text) if response is not None else None
