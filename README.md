@@ -60,15 +60,20 @@ the coordinates and colors of the scatter plot.
 
 ## Personal reflections
 
-My HW 02 feedback pointed out that I had put too much work in one commit.
-The HW 03 history makes it easier to see when the Serena parser worked
-and when support for Nadal's data was added. I want to keep using passing
-tests as checkpoints for individual commits in future projects.
+My HW 02 feedback pointed out that I had grouped too much work into one
+commit. For HW 03, I worked in small steps and committed as I went. The
+Serena parser and its offline test were one step. Adding support for Nadal's
+data was another.
 
-The two fixtures show why those checkpoints matter. Serena's file lists
-Anne Miller's birth date, while Nadal's file already lists Guillermo
-Platel's age in years. A small offline test for each format lets me verify
-the age difference independently of the website.
+Serena's sample lists Anne Miller's birth date. Nadal's sample gives
+Guillermo Platel's age directly in years. Keeping both examples locally
+lets me check the age difference for each format even when Tennis Abstract
+is unavailable.
+
+In a fresh Python environment, the package installed from a Git commit and
+both public functions ran on real player data. For future packages, I want
+to test each step before committing it and check the installation before
+submitting.
 
 ## AI assistance
 
